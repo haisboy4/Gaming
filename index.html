@@ -1,1 +1,56 @@
 
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Gaming hood store</title>
+
+  <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+
+    <h1 class="logo">Gaming hood store</h1>
+
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search games..."
+    >
+
+  </header>
+
+  <!-- FILTERS -->
+  <section class="filters">
+
+    <select id="emulatorFilter">
+      <option value="">All Emulators</option>
+    </select>
+
+    <select id="genreFilter">
+      <option value="">All Genres</option>
+    </select>
+
+    <select id="weightFilter">
+      <option value="">All Weights</option>
+      <option value="LIGHT">LIGHT</option>
+      <option value="MEDIUM">MEDIUM</option>
+      <option value="HEAVY">HEAVY</option>
+      <option value="EXTREME">EXTREME</option>
+    </select>
+
+  </section>
+
+  <!-- GAME GRID -->
+  <main id="gamesContainer" class="games-grid"></main>
+
+  <script src="js/script.js"></script>
+
+</body>
+</html>
