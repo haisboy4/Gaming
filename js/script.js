@@ -2,44 +2,39 @@
 
 let allGames = [];
 
-// LOAD CSV
+/* LOAD CSV */
+
 async function loadCSV() {
 
-  const response = await fetch("https://docs.google.com/spreadsheets/d/1Vdm7gPpnZDvqJw8n7WaxFyjF8-nDQRpooZrpEuJDV9M/export?format=csv");
-  const data = await response.text();
+  const response = await fetch(
+    "https://docs.google.com/spreadsheets/d/1Vdm7gPpnZDvqJw8n7WaxFyjF8-nDQRpooZrpEuJDV9M/export?format=csv"
+  );
 
-  const rows = data.split("\n").slice(1);
+  const csv = await response.text();
 
-  allGames = rows.map(row => {
+  const lines = csv.trim().split("\n");
 
-    const cols = row.split(",");
+  const headers = lines[0]
+    .split(",")
+    .map(h => h.trim());
 
-    return {
-      id: cols[0],
-      title: cols[1],
-      platform: cols[2],
-      emulator: cols[3],
-      genre: cols[4],
-      size_gb: cols[5],
-      min_ram: cols[6],
-      recommended_ram: cols[7],
-      gpu_level: cols[8],
-      offline: cols[9],
-      fps_low: cols[10],
-      fps_mid: cols[11],
-      fps_high: cols[12],
-      weight: cols[13],
-      image: cols[14],
-      description: cols[15],
-      download_link: cols[16],
-      emulator_link: cols[17],
-      tags: cols[18],
-      release_year: cols[19],
-      android_support: cols[20],
-      vulkan_required: cols[21],
-      controller_support: cols[22],
-      multiplayer: cols[23]
-    };
+  allGames = lines.slice(1).map(line => {
+
+    const values =
+      line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+
+    let game = {};
+
+    headers.forEach((header, index) => {
+
+      game[header] =
+        values[index]
+          ?.replace(/^"|"$/g, "")
+          .trim() || "";
+
+    });
+
+    return game;
 
   });
 
@@ -48,13 +43,19 @@ async function loadCSV() {
 
 }
 
+/* RENDER GAMES */
+
 function renderGames(games){
 
-  const container = document.getElementById("gamesContainer");
+  const container =
+    document.getElementById("gamesContainer");
 
   container.innerHTML = "";
 
   games.forEach(game => {
+
+    const weight =
+      game.weight.toUpperCase();
 
     container.innerHTML += `
 
@@ -69,10 +70,12 @@ function renderGames(games){
 
         <div class="game-content">
 
-          <h2 class="game-title">${game.title}</h2>
+          <h2 class="game-title">
+            ${game.title}
+          </h2>
 
-          <div class="badge ${game.weight}">
-            ${game.weight}
+          <div class="badge ${weight}">
+            ${weight}
           </div>
 
           <div class="game-info">
@@ -80,15 +83,16 @@ function renderGames(games){
             🎮 ${game.platform}<br>
             ⚡ ${game.emulator}<br>
             💾 ${game.size_gb} GB<br>
-            RAM: ${game.min_ram}GB+
+            🧠 RAM: ${game.min_ram}GB+
 
           </div>
 
           <a
             class="view-btn"
-            href="game.html?id=${game.id}"
+            href="${game.download_link}"
+            target="_blank"
           >
-            VIEW GAME
+            DOWNLOAD
           </a>
 
         </div>
@@ -100,6 +104,8 @@ function renderGames(games){
   });
 
 }
+
+/* FILTERS */
 
 function populateFilters(){
 
@@ -142,8 +148,6 @@ function populateFilters(){
 document.getElementById("searchInput")
 .addEventListener("input", filterGames);
 
-/* FILTERS */
-
 document.getElementById("emulatorFilter")
 .addEventListener("change", filterGames);
 
@@ -153,11 +157,14 @@ document.getElementById("genreFilter")
 document.getElementById("weightFilter")
 .addEventListener("change", filterGames);
 
+/* FILTER FUNCTION */
+
 function filterGames(){
 
   const search =
     document.getElementById("searchInput")
-    .value.toLowerCase();
+    .value
+    .toLowerCase();
 
   const emulator =
     document.getElementById("emulatorFilter")
@@ -178,13 +185,16 @@ function filterGames(){
       game.tags.toLowerCase().includes(search);
 
     const matchesEmulator =
-      !emulator || game.emulator === emulator;
+      !emulator ||
+      game.emulator === emulator;
 
     const matchesGenre =
-      !genre || game.genre === genre;
+      !genre ||
+      game.genre === genre;
 
     const matchesWeight =
-      !weight || game.weight === weight;
+      !weight ||
+      game.weight.toUpperCase() === weight;
 
     return (
       matchesSearch &&
